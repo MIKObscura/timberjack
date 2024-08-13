@@ -9,8 +9,14 @@
 #include <sstream>
 #include <string>
 
+/*
+* Recursively traverses the tree and puts the items found in the QTreeWidget
+* params:
+*  kv: vdf object that will be traversed
+*  list: top level items list
+*  parent: parent of the items currently being initialized (nullptr if top level item)
+*/
 void traverseTree(tyti::vdf::object &kv, QList<QTreeWidgetItem *> &list, QTreeWidgetItem *parent = nullptr){
-    
     for(auto it = kv.attribs.begin(); it != kv.attribs.end(); ++it){
         QStringList KVPair = {it->first.c_str(), it->second.c_str()};
         if(parent == nullptr){
@@ -19,6 +25,19 @@ void traverseTree(tyti::vdf::object &kv, QList<QTreeWidgetItem *> &list, QTreeWi
         else{
             new QTreeWidgetItem(parent, KVPair);
         }
+    }
+    for(auto it = kv.childs.begin(); it != kv.childs.end(); ++it){
+        QStringList sectionName = {it->first.c_str(), " "};
+        QList<QTreeWidgetItem *> section;
+        QTreeWidgetItem *item;
+        if(parent == nullptr){
+            item = new QTreeWidgetItem(static_cast<QTreeWidget *>(nullptr), sectionName);
+            list.append(item);
+        }
+        else{
+            item = new QTreeWidgetItem(parent, sectionName);
+        }
+        traverseTree(*it->second, section, item);
     }
 }
 
