@@ -45,11 +45,16 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
-    std::ostringstream out;
+    std::ostringstream title;
     std::ifstream file(argv[1]);
     auto tree = tyti::vdf::read<tyti::vdf::multikey_object>(file);
-    out << "Timberjack - " << tree.name;
-    w.setWindowTitle(QString(out.str().c_str()));
+    if(tree.name.empty()){ // if the vdf tree has no name, use the file name
+        title << "Timberjack - " << argv[1];
+    }
+    else{
+        title << "Timberjack - " << tree.name;
+    }
+    w.setWindowTitle(QString(title.str().c_str()));
     QList<QTreeWidgetItem *> items;
     traverseTree(tree, items);
     w.getTree()->insertTopLevelItems(0, items);
