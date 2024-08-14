@@ -16,7 +16,7 @@
 *  list: top level items list
 *  parent: parent of the items currently being initialized (nullptr if top level item)
 */
-void traverseTree(tyti::vdf::object &kv, QList<QTreeWidgetItem *> &list, QTreeWidgetItem *parent = nullptr){
+void traverseTree(tyti::vdf::multikey_object &kv, QList<QTreeWidgetItem *> &list, QTreeWidgetItem *parent = nullptr){
     for(auto it = kv.attribs.begin(); it != kv.attribs.end(); ++it){
         QStringList KVPair = {it->first.c_str(), it->second.c_str()};
         if(parent == nullptr){
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     MainWindow w;
     std::ostringstream out;
     std::ifstream file(argv[1]);
-    auto tree = tyti::vdf::read(file);
+    auto tree = tyti::vdf::read<tyti::vdf::multikey_object>(file);
     out << "Timberjack - " << tree.name;
     w.setWindowTitle(QString(out.str().c_str()));
     QList<QTreeWidgetItem *> items;
