@@ -5,9 +5,14 @@
 #include <QtWidgets/QTreeWidgetItem>
 #include <QList>
 #include <QString>
+#include <QShortcut>
+#include <QKeySequence>
+#include <QObject>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <string>
+#include <utility>
 
 /*
 * Recursively traverses the tree and puts the items found in the QTreeWidget
@@ -47,6 +52,44 @@ void traverseTree(tyti::vdf::multikey_object &kv, QList<QTreeWidgetItem *> &list
     }
 }
 
+void writeChanges(QTreeWidgetItem &item, tyti::vdf::multikey_object &parent){
+    int children = item.childCount();
+    if(children == 0){
+        parent.add_attribute(item.text(0).toStdString(), item.text(1).toStdString());
+        return;
+    }
+    for(int i = 0; i < children; i++){
+        QTreeWidgetItem* child = item.child(i);
+        if(child->childCount() > 0){
+            tyti::vdf::multikey_object child_object;
+            child_object.set_name(child->text(0).toStdString());
+            writeChanges(*child, child_object);
+            parent.add_child(std::make_unique<tyti::vdf::multikey_object>(child_object));
+        } else{
+            parent.add_attribute(child->text(0).toStdString(), child->text(1).toStdString());
+        }
+    }
+}
+
+void save(QTreeWidget* tree, auto name){
+    tyti::vdf::multikey_object root;
+    root.set_name(name);
+    int itemCount = tree->topLevelItemCount();
+    for(int i = 0; i < itemCount; i++){
+        auto item = tree->topLevelItem(i);
+        if(item->childCount() > 0){
+            tyti::vdf::multikey_object child_object;
+            child_object.set_name(item->text(0).toStdString());
+            writeChanges(*item, child_object);
+            root.add_child(std::make_unique<tyti::vdf::multikey_object>(child_object));
+        } else {
+            root.add_attribute(item->text(0).toStdString(), item->text(1).toStdString());
+        }
+    }
+    std::ofstream fout("test.txt");
+    tyti::vdf::write(fout, root);
+}
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -64,6 +107,9 @@ int main(int argc, char *argv[])
     QList<QTreeWidgetItem *> items;
     traverseTree(tree, items);
     w.getTree()->insertTopLevelItems(0, items);
+    QShortcut saveShortcut(&w);
+    saveShortcut.setKeys(QKeySequence::Save);
+    QObject::connect(&saveShortcut, &QShortcut::activated, &saveShortcut, [&]() {save(w.getTree(), tree.name);});
     w.show();
     return a.exec();
 }
