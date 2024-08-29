@@ -1,6 +1,6 @@
 # Timberjack
-Qt app made to view VDF format files as a sort of tree.
-
+Qt app made to view and edit VDF format files as a sort of tree.
+![screenshot](screenshot.png)
 # How to build
 First, you need CMake and the Qt framework libraries installed in order to build it.  
 Then, you first setup your CMake build directory like this for example:
