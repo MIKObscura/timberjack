@@ -71,7 +71,7 @@ void writeChanges(QTreeWidgetItem &item, tyti::vdf::multikey_object &parent){
     }
 }
 
-void save(QTreeWidget* tree, auto name){
+void save(QTreeWidget* tree, auto name, char* filename){
     tyti::vdf::multikey_object root;
     root.set_name(name);
     int itemCount = tree->topLevelItemCount();
@@ -86,7 +86,10 @@ void save(QTreeWidget* tree, auto name){
             root.add_attribute(item->text(0).toStdString(), item->text(1).toStdString());
         }
     }
-    std::ofstream fout("test.txt");
+    std::stringstream ss;
+    ss << "tj_" << filename;
+    std::string outputFilename = ss.str();
+    std::ofstream fout(outputFilename);
     tyti::vdf::write(fout, root);
 }
 
@@ -109,7 +112,7 @@ int main(int argc, char *argv[])
     w.getTree()->insertTopLevelItems(0, items);
     QShortcut saveShortcut(&w);
     saveShortcut.setKeys(QKeySequence::Save);
-    QObject::connect(&saveShortcut, &QShortcut::activated, &saveShortcut, [&]() {save(w.getTree(), tree.name);});
+    QObject::connect(&saveShortcut, &QShortcut::activated, &saveShortcut, [&]() {save(w.getTree(), tree.name, argv[1]);});
     w.show();
     return a.exec();
 }
