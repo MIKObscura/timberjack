@@ -19,11 +19,15 @@
 void traverseTree(tyti::vdf::multikey_object &kv, QList<QTreeWidgetItem *> &list, QTreeWidgetItem *parent = nullptr){
     for(auto it = kv.attribs.begin(); it != kv.attribs.end(); ++it){
         QStringList KVPair = {it->first.c_str(), it->second.c_str()};
+        QTreeWidgetItem *item;
         if(parent == nullptr){
-            list.append(new QTreeWidgetItem(static_cast<QTreeWidget *>(nullptr), KVPair));
+            item = new QTreeWidgetItem(static_cast<QTreeWidget *>(nullptr), KVPair);
+            item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable);
+            list.append(item);
         }
         else{
-            new QTreeWidgetItem(parent, KVPair);
+            item = new QTreeWidgetItem(parent, KVPair);
+            item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable);
         }
     }
     for(auto it = kv.childs.begin(); it != kv.childs.end(); ++it){
@@ -32,10 +36,12 @@ void traverseTree(tyti::vdf::multikey_object &kv, QList<QTreeWidgetItem *> &list
         QTreeWidgetItem *item;
         if(parent == nullptr){
             item = new QTreeWidgetItem(static_cast<QTreeWidget *>(nullptr), sectionName);
+            item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable);
             list.append(item);
         }
         else{
             item = new QTreeWidgetItem(parent, sectionName);
+            item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable);
         }
         traverseTree(*it->second, section, item);
     }
